@@ -233,22 +233,22 @@ def _pack_packet(hostname, service, state, output, timestamp):
     offset = struct.calcsize(header_format)
     struct.pack_into('!hxxLLh', packet, 0, PACKET_VERSION, 0, timestamp, state)
     # next, pad & pack the hostname
-    hostname = hostname + b'\0'
-    if len(hostname) < MAX_HOSTNAME_LENGTH:
-        hostname += get_random_alphanumeric_bytes(MAX_HOSTNAME_LENGTH - len(hostname))
-    struct.pack_into('!%ds' % (MAX_HOSTNAME_LENGTH,), packet, offset, hostname)
+    #hostname = "{}{}".format(hostname, b'\0')
+    #f len(hostname) < MAX_HOSTNAME_LENGTH:
+    #    hostname = "{}{}".format(hostname, get_random_alphanumeric_bytes(MAX_HOSTNAME_LENGTH - len(hostname)))
+    struct.pack_into('!%ds' % (MAX_HOSTNAME_LENGTH,), packet, offset, str.encode(hostname))
     offset += struct.calcsize('!%ds' % (MAX_HOSTNAME_LENGTH,))
     # next, pad & pack the service description
-    service = service + b'\0'
-    if len(service) < MAX_DESCRIPTION_LENGTH:
-        service += get_random_alphanumeric_bytes(MAX_DESCRIPTION_LENGTH - len(service))
-    struct.pack_into('%ds' % (MAX_DESCRIPTION_LENGTH,), packet, offset, service)
+    #service = "{}{}".format(service, b'\0')
+    #if len(service) < MAX_DESCRIPTION_LENGTH:
+    #    service = "{}{}".format(service, get_random_alphanumeric_bytes(MAX_DESCRIPTION_LENGTH - len(service)))
+    struct.pack_into('%ds' % (MAX_DESCRIPTION_LENGTH,), packet, offset, str.encode(service))
     offset += struct.calcsize('!%ds' % (MAX_DESCRIPTION_LENGTH))
     # finally, pad & pack the plugin output
-    output = output + b'\0'
-    if len(output) < MAX_PLUGINOUTPUT_LENGTH:
-        output += get_random_alphanumeric_bytes(MAX_PLUGINOUTPUT_LENGTH - len(output))
-    struct.pack_into('%ds' % (MAX_PLUGINOUTPUT_LENGTH,), packet, offset, output)
+    #output = "{}{}".format(output, b'\0')
+    #if len(output) < MAX_PLUGINOUTPUT_LENGTH:
+    #    output = "{}{}".format(output, get_random_alphanumeric_bytes(MAX_PLUGINOUTPUT_LENGTH - len(output)))
+    struct.pack_into('%ds' % (MAX_PLUGINOUTPUT_LENGTH,), packet, offset, str.encode(output))
     # compute the CRC32 of what we have so far
     crc_val = binascii.crc32(packet) & 0xffffffff
     struct.pack_into('!L', packet, 4, crc_val)
@@ -346,7 +346,7 @@ class NscaSender(object):
                 raise ValueError("service %r too long (max length %d)" % (service, MAX_DESCRIPTION_LENGTH))
 
     def send_service(self, host, service, state, description):
-        self._check_alert(host=host, service=service, state=state, description=description)
+        #self._check_alert(host=host, service=service, state=state, description=description)
         self.connect()
         for conn, iv, timestamp in self._conns:
             if conn not in self._cached_crypters:
